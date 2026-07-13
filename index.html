@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SODA — калькулятор вартості прибирання</title>
+<title>SODA — калькулятор та CRM</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230b7d8a'/%3E%3Ccircle cx='12' cy='12' r='4' fill='%23ffffff' opacity='0.9'/%3E%3Ccircle cx='21' cy='19' r='2.5' fill='%23ffffff' opacity='0.7'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -243,6 +243,106 @@ header {
 
 footer.note { text-align: center; font-size: .75rem; color: var(--text-faint); padding: .5rem 1rem 1.5rem; }
 
+/* ── Вкладки ───────────────────────────────────────────────── */
+.tabs {
+  display: flex; gap: .3rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: .3rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+.tabs .tab {
+  flex: 1;
+  padding: .55rem .5rem;
+  border-radius: var(--radius-md);
+  font-weight: 600; font-size: .9rem;
+  color: var(--text-muted);
+}
+.tabs .tab:hover { color: var(--text); }
+.tabs .tab.on { background: var(--primary); color: #fff; }
+[data-theme="dark"] .tabs .tab.on { color: #10181a; }
+body.crm-mode .totalbar { display: none; }
+body.crm-mode { padding-bottom: 2rem; }
+
+/* ── CRM ───────────────────────────────────────────────────── */
+.crm-toolbar { display: flex; gap: .35rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+.chip {
+  padding: .35rem .7rem;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface);
+  font-size: .8rem; color: var(--text-muted);
+}
+.chip:hover { border-color: var(--text-faint); color: var(--text); }
+.chip.on { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+.crm-refresh {
+  margin-left: auto;
+  width: 36px; height: 36px;
+  border: 1px solid var(--border); border-radius: 50%;
+  display: grid; place-items: center;
+  color: var(--text-muted); background: var(--surface);
+}
+.crm-refresh:hover { color: var(--text); border-color: var(--text-faint); }
+.crm-refresh.spin svg { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.lead {
+  display: flex; align-items: center; gap: .75rem;
+  width: 100%; text-align: left;
+  padding: .8rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: .5rem;
+  box-shadow: var(--shadow-sm);
+}
+.lead:hover { border-color: var(--primary); }
+.lead-main { flex: 1; min-width: 0; }
+.lead-name { font-weight: 600; font-size: .95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lead-phone { font-size: .8rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.lead-meta { text-align: right; flex: none; }
+.lead-date { font-size: .72rem; color: var(--text-faint); margin-top: .3rem; font-variant-numeric: tabular-nums; }
+.badge { display: inline-block; padding: .2rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 600; white-space: nowrap; }
+.st-new  { background: var(--primary-soft); color: var(--primary); }
+.st-view { background: var(--warning-soft); color: var(--warning); }
+.st-plan { background: #e6e6f8; color: #4d4dae; }
+[data-theme="dark"] .st-plan { background: #26263e; color: #a3a3e8; }
+.st-done { background: #e0f2e3; color: #2e7d3a; }
+[data-theme="dark"] .st-done { background: #1e3524; color: #82c98f; }
+
+.crm-empty { text-align: center; color: var(--text-muted); font-size: .9rem; padding: 2rem 1rem; }
+.crm-error {
+  padding: .75rem 1rem; border-radius: var(--radius-md);
+  background: var(--warning-soft); color: var(--warning);
+  font-size: .85rem; margin-bottom: 1rem;
+}
+.skel { height: 64px; border-radius: var(--radius-lg); margin-bottom: .5rem; background: linear-gradient(90deg, var(--surface-2) 25%, var(--divider) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border: 1px solid var(--border); }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.crm-back {
+  display: inline-flex; align-items: center; gap: .35rem;
+  color: var(--text-muted); font-size: .85rem; font-weight: 600;
+  margin-bottom: .75rem; padding: .35rem .5rem; border-radius: var(--radius-sm);
+}
+.crm-back:hover { color: var(--text); }
+.client-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; flex-wrap: wrap; margin-bottom: .25rem; }
+.client-name { font-size: 1.25rem; font-weight: 700; }
+.client-phone { display: inline-block; margin-top: .15rem; color: var(--primary); font-weight: 600; text-decoration: none; font-variant-numeric: tabular-nums; }
+.client-date { font-size: .78rem; color: var(--text-faint); margin-top: .2rem; }
+.f-group { margin-top: 1rem; }
+select.num-input { font-weight: 500; appearance: auto; }
+textarea.num-input { font-weight: 400; font-size: .95rem; resize: vertical; min-height: 84px; font-family: inherit; }
+.save-row { display: flex; gap: .5rem; margin-top: 1.25rem; align-items: center; }
+.save-row .btn-primary { flex: 1; padding: .75rem; font-size: .95rem; }
+.save-state { font-size: .8rem; color: var(--text-muted); }
+
+.login-card { max-width: 380px; margin: 2.5rem auto; text-align: center; }
+.login-card p { font-size: .85rem; color: var(--text-muted); margin: .5rem 0 1rem; }
+.login-card .num-input { text-align: center; letter-spacing: .05em; }
+.login-err { color: var(--warning); font-size: .8rem; margin-top: .5rem; display: none; }
+.login-err.show { display: block; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
@@ -276,6 +376,13 @@ footer.note { text-align: center; font-size: .75rem; color: var(--text-faint); p
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
   </header>
+
+  <nav class="tabs" aria-label="Розділи">
+    <button class="tab on" id="tabCalc" type="button">Калькулятор</button>
+    <button class="tab" id="tabCrm" type="button">CRM</button>
+  </nav>
+
+  <div id="viewCalc">
 
   <!-- Основне прибирання -->
   <section class="card">
@@ -327,6 +434,93 @@ footer.note { text-align: center; font-size: .75rem; color: var(--text-faint); p
   </section>
 
   <footer class="note">Мінімальне замовлення: підтримуюче — 1500 грн, генеральне — 3000 грн. Сильний жир або занедбаний стан кухонних меблів — від 500 грн/пог.м.</footer>
+
+  </div><!-- /viewCalc -->
+
+  <div id="viewCrm" hidden>
+
+    <!-- Вхід -->
+    <div class="card login-card" id="crmLogin" hidden>
+      <h2 style="margin-bottom:.25rem">Вхід у CRM</h2>
+      <p>Введіть код доступу, який вам надав керівник</p>
+      <input class="num-input" id="crmCode" type="password" autocomplete="off" placeholder="Код доступу">
+      <div class="login-err" id="loginErr">Невірний код. Спробуйте ще раз.</div>
+      <button class="btn btn-primary" id="crmLoginBtn" style="width:100%;margin-top:1rem;padding:.7rem">Увійти</button>
+    </div>
+
+    <!-- Список клієнтів -->
+    <div id="crmList" hidden>
+      <div class="crm-toolbar" id="crmFilters"></div>
+      <div id="crmListBody"></div>
+    </div>
+
+    <!-- Карточка клієнта -->
+    <div id="crmDetail" hidden>
+      <button class="crm-back" id="crmBack" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        До списку
+      </button>
+      <div class="card">
+        <div class="client-head">
+          <div>
+            <div class="client-name" id="cName"></div>
+            <a class="client-phone" id="cPhone" href="#"></a>
+            <div class="client-date" id="cDate"></div>
+          </div>
+          <span class="badge" id="cBadge"></span>
+        </div>
+
+        <div class="f-group">
+          <label class="field-label" for="fStatus">Статус клієнта</label>
+          <select class="num-input" id="fStatus"></select>
+        </div>
+        <div class="f-group">
+          <label class="field-label" for="fService">Вид прибирання</label>
+          <select class="num-input" id="fService">
+            <option value="">— не вказано —</option>
+            <option>Підтримуюче / вікна</option>
+            <option>Генеральне</option>
+            <option>Генеральне / вікна</option>
+            <option>Післябудівельне</option>
+            <option>Післябудівельне / вікна</option>
+            <option>Хімчистка</option>
+            <option>Інше</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="field-label" for="fAddress">Адреса</label>
+          <input class="num-input" id="fAddress" type="text" placeholder="вул. Прикладна, 1, кв. 2" style="font-weight:400">
+        </div>
+        <div class="row2" style="margin-top:1rem">
+          <div>
+            <label class="field-label" for="fPtype">Тип приміщення</label>
+            <select class="num-input" id="fPtype">
+              <option value="">— не вказано —</option>
+              <option>Квартира</option>
+              <option>Будинок</option>
+              <option>Офіс</option>
+              <option>Комерційне приміщення</option>
+              <option>Інше</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="fArea">Площа, м²</label>
+            <input class="num-input" id="fArea" type="number" inputmode="decimal" min="0" step="0.5" placeholder="Напр. 65">
+          </div>
+        </div>
+        <div class="f-group">
+          <label class="field-label" for="fComment">Коментар</label>
+          <textarea class="num-input" id="fComment" rows="3" placeholder="Деталі замовлення, побажання клієнта…"></textarea>
+        </div>
+
+        <div class="save-row">
+          <button class="btn btn-primary" id="crmSaveBtn" type="button">Зберегти</button>
+          <span class="save-state" id="saveState"></span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /viewCrm -->
 </div>
 
 <div class="totalbar">
@@ -546,6 +740,7 @@ $('copyBtn').addEventListener('click', async () => {
     document.execCommand('copy'); ta.remove();
   }
   const toast = $('toast');
+  toast.textContent = 'Розрахунок скопійовано';
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 1800);
 });
@@ -574,6 +769,229 @@ $('resetBtn').addEventListener('click', () => {
 })();
 
 render();
+
+/* ── CRM ──────────────────────────────────────────────────── */
+const CRM_API = ''; // URL веб-застосунку Google Apps Script
+const STATUSES = ['Новий', 'Перегляд', 'Заплановане прибирання', 'Виконане прибирання'];
+const ST_CLASS = {
+  'Новий': 'st-new',
+  'Перегляд': 'st-view',
+  'Заплановане прибирання': 'st-plan',
+  'Виконане прибирання': 'st-done',
+};
+const SHORT_ST = { 'Заплановане прибирання': 'Заплановане', 'Виконане прибирання': 'Виконане' };
+
+const crm = { code: localStorage.getItem('soda_crm_code') || '', rows: [], filter: 'Всі', current: null, loaded: false };
+
+const cleanPhone = p => String(p || '').trim().replace(/\.0$/, '');
+const telHref = p => 'tel:' + cleanPhone(p).replace(/[^\d+]/g, '').replace(/^380/, '+380');
+const stOf = r => r.status || 'Новий';
+function fmtDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return String(iso || '');
+  return d.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: '2-digit' }) + ' ' +
+         d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+}
+
+/* Перемикання вкладок */
+function showView(view) {
+  const isCrm = view === 'crm';
+  $('viewCalc').hidden = isCrm;
+  $('viewCrm').hidden = !isCrm;
+  $('tabCalc').classList.toggle('on', !isCrm);
+  $('tabCrm').classList.toggle('on', isCrm);
+  document.body.classList.toggle('crm-mode', isCrm);
+  if (isCrm) crmEnter();
+}
+$('tabCalc').addEventListener('click', () => showView('calc'));
+$('tabCrm').addEventListener('click', () => showView('crm'));
+
+function crmShow(section) {
+  $('crmLogin').hidden = section !== 'login';
+  $('crmList').hidden = section !== 'list';
+  $('crmDetail').hidden = section !== 'detail';
+}
+
+function crmEnter() {
+  if (!CRM_API) {
+    crmShow('list');
+    $('crmFilters').innerHTML = '';
+    $('crmListBody').innerHTML = '<div class="crm-empty">CRM ще не підключено до таблиці заявок.</div>';
+    return;
+  }
+  if (!crm.code) { crmShow('login'); return; }
+  crmShow('list');
+  if (!crm.loaded) loadLeads();
+  else renderLeads();
+}
+
+/* Вхід */
+async function tryLogin() {
+  const code = $('crmCode').value.trim();
+  if (!code) return;
+  const btn = $('crmLoginBtn');
+  btn.disabled = true; btn.textContent = 'Перевірка…';
+  $('loginErr').classList.remove('show');
+  try {
+    const res = await apiList(code);
+    crm.code = code;
+    localStorage.setItem('soda_crm_code', code);
+    crm.rows = res; crm.loaded = true;
+    crmShow('list'); renderFilters(); renderLeads();
+  } catch (e) {
+    $('loginErr').textContent = e.message === 'auth' ? 'Невірний код. Спробуйте ще раз.' : 'Помилка з’єднання. Спробуйте пізніше.';
+    $('loginErr').classList.add('show');
+  }
+  btn.disabled = false; btn.textContent = 'Увійти';
+}
+$('crmLoginBtn').addEventListener('click', tryLogin);
+$('crmCode').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+
+/* API */
+async function apiList(code) {
+  const r = await fetch(CRM_API + '?action=list&token=' + encodeURIComponent(code));
+  const d = await r.json();
+  if (!d.ok) throw new Error(d.error || 'error');
+  return d.rows;
+}
+async function apiUpdate(row, fields) {
+  const r = await fetch(CRM_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ token: crm.code, action: 'update', row, fields }),
+  });
+  const d = await r.json();
+  if (!d.ok) throw new Error(d.error || 'error');
+}
+
+/* Список */
+async function loadLeads() {
+  const body = $('crmListBody');
+  renderFilters();
+  body.innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  try {
+    crm.rows = await apiList(crm.code);
+    crm.loaded = true;
+    renderLeads();
+  } catch (e) {
+    if (e.message === 'auth') {
+      crm.code = ''; localStorage.removeItem('soda_crm_code');
+      crmShow('login');
+      return;
+    }
+    body.innerHTML = '<div class="crm-error">Не вдалося завантажити заявки. Перевірте інтернет і спробуйте ще раз.</div>' +
+      '<button class="btn" id="retryBtn" style="width:100%">Спробувати ще раз</button>';
+    document.getElementById('retryBtn').addEventListener('click', loadLeads);
+  }
+}
+
+function renderFilters() {
+  const box = $('crmFilters');
+  box.innerHTML = '';
+  ['Всі', ...STATUSES].forEach(st => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (crm.filter === st ? ' on' : '');
+    const count = st === 'Всі' ? crm.rows.length : crm.rows.filter(r => stOf(r) === st).length;
+    b.textContent = (SHORT_ST[st] || st) + (crm.loaded ? ` (${count})` : '');
+    b.addEventListener('click', () => { crm.filter = st; renderFilters(); renderLeads(); });
+    box.appendChild(b);
+  });
+  const rf = document.createElement('button');
+  rf.type = 'button'; rf.className = 'crm-refresh'; rf.title = 'Оновити'; rf.setAttribute('aria-label', 'Оновити');
+  rf.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>';
+  rf.addEventListener('click', () => { rf.classList.add('spin'); loadLeads(); });
+  box.appendChild(rf);
+}
+
+function renderLeads() {
+  renderFilters();
+  const body = $('crmListBody');
+  body.innerHTML = '';
+  const rows = crm.rows
+    .filter(r => crm.filter === 'Всі' || stOf(r) === crm.filter)
+    .sort((a, b) => b.row - a.row);
+  if (!rows.length) {
+    body.innerHTML = '<div class="crm-empty">Немає заявок у цій категорії.</div>';
+    return;
+  }
+  rows.forEach(r => {
+    const st = stOf(r);
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'lead';
+    b.innerHTML = `
+      <div class="lead-main">
+        <div class="lead-name"></div>
+        <div class="lead-phone"></div>
+      </div>
+      <div class="lead-meta">
+        <span class="badge ${ST_CLASS[st]}">${SHORT_ST[st] || st}</span>
+        <div class="lead-date">${fmtDate(r.ts)}</div>
+      </div>`;
+    b.querySelector('.lead-name').textContent = r.name || 'Без імені';
+    b.querySelector('.lead-phone').textContent = cleanPhone(r.phone);
+    b.addEventListener('click', () => openDetail(r));
+    body.appendChild(b);
+  });
+}
+
+/* Карточка */
+function openDetail(r) {
+  crm.current = r;
+  $('cName').textContent = r.name || 'Без імені';
+  $('cPhone').textContent = cleanPhone(r.phone);
+  $('cPhone').href = telHref(r.phone);
+  $('cDate').textContent = 'Заявка від ' + fmtDate(r.ts);
+  const st = stOf(r);
+  $('cBadge').textContent = SHORT_ST[st] || st;
+  $('cBadge').className = 'badge ' + ST_CLASS[st];
+  const sel = $('fStatus');
+  sel.innerHTML = STATUSES.map(s => `<option${s === st ? ' selected' : ''}>${s}</option>`).join('');
+  $('fService').value = r.service || '';
+  if ($('fService').value !== (r.service || '')) { $('fService').value = 'Інше'; }
+  $('fAddress').value = r.address || '';
+  $('fPtype').value = r.ptype || '';
+  if ($('fPtype').value !== (r.ptype || '')) { $('fPtype').value = 'Інше'; }
+  $('fArea').value = r.area || '';
+  $('fComment').value = r.comment || '';
+  $('saveState').textContent = '';
+  crmShow('detail');
+  window.scrollTo({ top: 0 });
+}
+$('crmBack').addEventListener('click', () => { crmShow('list'); renderLeads(); });
+
+$('fStatus').addEventListener('change', () => {
+  const st = $('fStatus').value;
+  $('cBadge').textContent = SHORT_ST[st] || st;
+  $('cBadge').className = 'badge ' + ST_CLASS[st];
+});
+
+$('crmSaveBtn').addEventListener('click', async () => {
+  const r = crm.current;
+  if (!r) return;
+  const btn = $('crmSaveBtn');
+  const fields = {
+    status: $('fStatus').value,
+    service: $('fService').value,
+    address: $('fAddress').value.trim(),
+    ptype: $('fPtype').value,
+    area: $('fArea').value,
+    comment: $('fComment').value.trim(),
+  };
+  btn.disabled = true; btn.textContent = 'Збереження…'; $('saveState').textContent = '';
+  try {
+    await apiUpdate(r.row, fields);
+    Object.assign(r, fields);
+    $('saveState').textContent = 'Збережено ✓';
+    const toast = $('toast');
+    toast.textContent = 'Зміни збережено';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1600);
+  } catch (e) {
+    $('saveState').textContent = 'Помилка збереження. Спробуйте ще раз.';
+  }
+  btn.disabled = false; btn.textContent = 'Зберегти';
+});
 </script>
 </body>
 </html>
