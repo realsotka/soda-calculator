@@ -304,12 +304,21 @@ body.crm-mode { padding-bottom: 2rem; }
 .lead-meta { text-align: right; flex: none; }
 .lead-date { font-size: .72rem; color: var(--text-faint); margin-top: .3rem; font-variant-numeric: tabular-nums; }
 .badge { display: inline-block; padding: .2rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 600; white-space: nowrap; }
-.st-new  { background: var(--primary-soft); color: var(--primary); }
-.st-view { background: var(--warning-soft); color: var(--warning); }
-.st-plan { background: #e6e6f8; color: #4d4dae; }
-[data-theme="dark"] .st-plan { background: #26263e; color: #a3a3e8; }
+.st-bot, .st-site { background: #ebebe7; color: #5f5e58; }
+[data-theme="dark"] .st-bot, [data-theme="dark"] .st-site { background: #2d2d2a; color: #a5a49e; }
+.st-work { background: #e1ecfa; color: #23569f; }
+[data-theme="dark"] .st-work { background: #1c2b42; color: #82abe8; }
+.st-view { background: #fbe7d8; color: #b35a10; }
+[data-theme="dark"] .st-view { background: #3a2817; color: #e8a45e; }
+.st-plan { background: #f9f0cd; color: #8f6c07; }
+[data-theme="dark"] .st-plan { background: #37301a; color: #d9b53e; }
 .st-done { background: #e0f2e3; color: #2e7d3a; }
 [data-theme="dark"] .st-done { background: #1e3524; color: #82c98f; }
+.st-ref  { background: #f5dcdc; color: #8c1d1d; }
+[data-theme="dark"] .st-ref { background: #3b1d1d; color: #d97575; }
+
+.chip[class*="st-"] { border-color: transparent; }
+.chip.on[class*="st-"] { border-color: currentColor; font-weight: 600; }
 
 .crm-empty { text-align: center; color: var(--text-muted); font-size: .9rem; padding: 2rem 1rem; }
 .crm-error {
@@ -497,6 +506,14 @@ textarea.num-input { font-weight: 400; font-size: .95rem; resize: vertical; min-
         <div class="f-group">
           <label class="field-label" for="fStatus">Статус клієнта</label>
           <select class="num-input" id="fStatus"></select>
+        </div>
+        <div class="f-group" id="gReason" hidden>
+          <label class="field-label" for="fReason">Причина відмови</label>
+          <select class="num-input" id="fReason">
+            <option>Дорого</option>
+            <option>Не підійшла дата</option>
+            <option>Інше</option>
+          </select>
         </div>
         <div class="f-group">
           <label class="field-label" for="fService">Вид прибирання</label>
@@ -797,20 +814,28 @@ render();
 
 /* ── CRM ──────────────────────────────────────────────────── */
 const CRM_API = 'https://script.google.com/macros/s/AKfycbwpaif_7kijGIplSjX-bFYu9-LE4SambuT2kgRpi2oMcXBMYRPO3hvc2NJ4MhAjez-1/exec';
-const STATUSES = ['Новий', 'Перегляд', 'Заплановане прибирання', 'Виконане прибирання'];
+const STATUSES = ['Бот', 'Заявки з сайту', 'В роботі', 'Перегляд', 'Заплановане прибирання', 'Виконане прибирання', 'Відмова'];
 const ST_CLASS = {
-  'Новий': 'st-new',
+  'Бот': 'st-bot',
+  'Заявки з сайту': 'st-site',
+  'В роботі': 'st-work',
   'Перегляд': 'st-view',
   'Заплановане прибирання': 'st-plan',
   'Виконане прибирання': 'st-done',
+  'Відмова': 'st-ref',
 };
 const SHORT_ST = { 'Заплановане прибирання': 'Заплановане', 'Виконане прибирання': 'Виконане' };
+const BADGE_ST = Object.assign({ 'Заявки з сайту': 'Сайт' }, SHORT_ST);
 
 const crm = { code: localStorage.getItem('soda_crm_code') || '', rows: [], filter: 'Всі', current: null, loaded: false };
 
 const cleanPhone = p => String(p || '').trim().replace(/\.0$/, '');
 const telHref = p => 'tel:' + cleanPhone(p).replace(/[^\d+]/g, '').replace(/^380/, '+380');
-const stOf = r => r.status || 'Новий';
+const stOf = r => {
+  const s = String(r.status || '').trim();
+  if (!s || s === 'Новий') return 'Заявки з сайту';
+  return s;
+};
 function fmtDate(iso) {
   const d = new Date(iso);
   if (isNaN(d)) return String(iso || '');
@@ -919,7 +944,7 @@ function renderFilters() {
   ['Всі', ...STATUSES].forEach(st => {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'chip' + (crm.filter === st ? ' on' : '');
+    b.className = 'chip' + (ST_CLASS[st] ? ' ' + ST_CLASS[st] : '') + (crm.filter === st ? ' on' : '');
     const count = st === 'Всі' ? crm.rows.length : crm.rows.filter(r => stOf(r) === st).length;
     b.textContent = (SHORT_ST[st] || st) + (crm.loaded ? ` (${count})` : '');
     b.addEventListener('click', () => { crm.filter = st; renderFilters(); renderLeads(); });
@@ -959,7 +984,7 @@ function renderLeads() {
         <div class="lead-phone"></div>
       </div>
       <div class="lead-meta">
-        <span class="badge ${ST_CLASS[st]}">${SHORT_ST[st] || st}</span>
+        <span class="badge ${ST_CLASS[st]}">${BADGE_ST[st] || st}</span>
         <div class="lead-date">${fmtDate(r.ts)}</div>
       </div>`;
     b.querySelector('.lead-name').textContent = r.name || 'Без імені';
@@ -972,10 +997,13 @@ function renderLeads() {
 /* Карточка */
 function fillForm(r) {
   const st = stOf(r);
-  $('cBadge').textContent = SHORT_ST[st] || st;
+  $('cBadge').textContent = BADGE_ST[st] || st;
   $('cBadge').className = 'badge ' + ST_CLASS[st];
   const sel = $('fStatus');
   sel.innerHTML = STATUSES.map(s => `<option${s === st ? ' selected' : ''}>${s}</option>`).join('');
+  $('gReason').hidden = st !== 'Відмова';
+  $('fReason').value = r.reason || 'Дорого';
+  if ($('fReason').value !== (r.reason || 'Дорого')) { $('fReason').value = 'Інше'; }
   $('fService').value = r.service || '';
   if ($('fService').value !== (r.service || '')) { $('fService').value = 'Інше'; }
   $('fAddress').value = r.address || '';
@@ -1012,7 +1040,7 @@ function openAdd() {
   $('gPhone').hidden = false;
   $('fName').value = '';
   $('fPhone').value = '';
-  fillForm({ status: 'Новий' });
+  fillForm({ status: 'В роботі' });
   crmShow('detail');
   window.scrollTo({ top: 0 });
   $('fName').focus();
@@ -1021,8 +1049,9 @@ $('crmBack').addEventListener('click', () => { crmShow('list'); renderLeads(); }
 
 $('fStatus').addEventListener('change', () => {
   const st = $('fStatus').value;
-  $('cBadge').textContent = SHORT_ST[st] || st;
+  $('cBadge').textContent = BADGE_ST[st] || st;
   $('cBadge').className = 'badge ' + ST_CLASS[st];
+  $('gReason').hidden = st !== 'Відмова';
 });
 
 function showToast(msg) {
@@ -1043,6 +1072,7 @@ $('crmSaveBtn').addEventListener('click', async () => {
     area: $('fArea').value,
     comment: $('fComment').value.trim(),
   };
+  fields.reason = $('fStatus').value === 'Відмова' ? $('fReason').value : '';
   fields.name = $('fName').value.trim();
   if (!r || r.src === 'manual') {
     fields.phone = $('fPhone').value.trim();
