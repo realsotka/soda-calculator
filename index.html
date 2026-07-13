@@ -991,7 +991,7 @@ function openDetail(r) {
   $('clientHead').hidden = false;
   $('crmDelBtn').hidden = false;
   const manual = r.src === 'manual';
-  $('gName').hidden = !manual;
+  $('gName').hidden = false;
   $('gPhone').hidden = !manual;
   $('fName').value = r.name || '';
   $('fPhone').value = cleanPhone(r.phone);
@@ -1043,8 +1043,8 @@ $('crmSaveBtn').addEventListener('click', async () => {
     area: $('fArea').value,
     comment: $('fComment').value.trim(),
   };
+  fields.name = $('fName').value.trim();
   if (!r || r.src === 'manual') {
-    fields.name = $('fName').value.trim();
     fields.phone = $('fPhone').value.trim();
   }
   if (!r && !fields.name && !fields.phone) {
@@ -1058,11 +1058,9 @@ $('crmSaveBtn').addEventListener('click', async () => {
       Object.assign(r, fields);
       $('saveState').textContent = 'Збережено ✓';
       showToast('Зміни збережено');
-      if (r.src === 'manual') {
-        $('cName').textContent = r.name || 'Без імені';
-        $('cPhone').textContent = cleanPhone(r.phone);
-        $('cPhone').href = telHref(r.phone);
-      }
+      $('cName').textContent = r.name || 'Без імені';
+      $('cPhone').textContent = cleanPhone(r.phone);
+      $('cPhone').href = telHref(r.phone);
     } else {
       await apiAdd(fields);
       showToast('Клієнта додано');
