@@ -119,12 +119,15 @@ header {
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
 @media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
 
+html { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
 .num-input {
   width: 100%;
   padding: .55rem .75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface-2);
+  color: var(--text);
   font-size: 1.05rem; font-weight: 600;
 }
 .num-input::placeholder { color: var(--text-faint); font-weight: 400; }
@@ -849,9 +852,24 @@ const stOf = r => {
   return s;
 };
 const PLAN_STS = ['Заплановане прибирання', 'Виконане прибирання'];
+function cleanYmd(s) {
+  s = String(s || '').trim();
+  if (!s) return '';
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  // формат Date.toString(): "Sun Jul 19 2026 00:00:00 GMT+0300 (...)"
+  const t = s.match(/^\w{3} (\w{3}) (\d{1,2}) (\d{4})/);
+  if (t) {
+    const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(t[1]) + 1;
+    if (mo >= 1) return `${t[3]}-${String(mo).padStart(2, '0')}-${t[2].padStart(2, '0')}`;
+  }
+  const d = new Date(s);
+  if (isNaN(d)) return '';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 function fmtClean(s) {
-  const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
-  return m ? `${m[3]}.${m[2]}.${m[1].slice(2)}` : String(s || '');
+  const ymd = cleanYmd(s);
+  return ymd ? `${ymd.slice(8, 10)}.${ymd.slice(5, 7)}.${ymd.slice(2, 4)}` : String(s || '');
 }
 function fmtDate(iso) {
   const d = new Date(iso);
@@ -1022,8 +1040,7 @@ function fillForm(r) {
   $('fReason').value = r.reason || 'Дорого';
   if ($('fReason').value !== (r.reason || 'Дорого')) { $('fReason').value = 'Інше'; }
   $('gPlan').hidden = !PLAN_STS.includes(st);
-  const cd = String(r.cleanDate || '').match(/^\d{4}-\d{2}-\d{2}/);
-  $('fCleanDate').value = cd ? cd[0] : '';
+  $('fCleanDate').value = cleanYmd(r.cleanDate);
   $('fPrice').value = r.price || '';
   $('fService').value = r.service || '';
   if ($('fService').value !== (r.service || '')) { $('fService').value = 'Інше'; }
