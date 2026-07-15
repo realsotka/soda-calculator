@@ -227,8 +227,8 @@ header {
 .btn:hover { color: var(--text); border-color: var(--text-faint); }
 .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
 .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: #fff; }
-[data-theme="dark"] .btn-primary { color: #10181a; }
-[data-theme="dark"] .btn-primary:hover { color: #10181a; }
+[data-theme="dark"] .btn-primary { color: #fff; }
+[data-theme="dark"] .btn-primary:hover { color: #fff; }
 
 .toast {
   position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(8px);
@@ -316,6 +316,8 @@ body.crm-mode { padding-bottom: 2rem; }
 [data-theme="dark"] .st-done { background: #1e3524; color: #82c98f; }
 .st-ref  { background: #f5dcdc; color: #8c1d1d; }
 [data-theme="dark"] .st-ref { background: #3b1d1d; color: #d97575; }
+.lead-clean { color: #8f6c07; font-weight: 600; }
+[data-theme="dark"] .lead-clean { color: #d9b53e; }
 
 .chip[class*="st-"] { border-color: transparent; }
 .chip.on[class*="st-"] { border-color: currentColor; font-weight: 600; }
@@ -514,6 +516,16 @@ textarea.num-input { font-weight: 400; font-size: .95rem; resize: vertical; min-
             <option>Не підійшла дата</option>
             <option>Інше</option>
           </select>
+        </div>
+        <div class="row2" id="gPlan" hidden style="margin-top:1rem">
+          <div>
+            <label class="field-label" for="fCleanDate">Дата прибирання</label>
+            <input class="num-input" id="fCleanDate" type="date" style="font-weight:400">
+          </div>
+          <div>
+            <label class="field-label" for="fPrice">Ціна, грн</label>
+            <input class="num-input" id="fPrice" type="number" inputmode="numeric" min="0" step="50" placeholder="Напр. 3500">
+          </div>
         </div>
         <div class="f-group">
           <label class="field-label" for="fService">Вид прибирання</label>
@@ -836,6 +848,11 @@ const stOf = r => {
   if (!s || s === 'Новий') return 'Заявки з сайту';
   return s;
 };
+const PLAN_STS = ['Заплановане прибирання', 'Виконане прибирання'];
+function fmtClean(s) {
+  const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}.${m[2]}.${m[1].slice(2)}` : String(s || '');
+}
 function fmtDate(iso) {
   const d = new Date(iso);
   if (isNaN(d)) return String(iso || '');
@@ -985,7 +1002,7 @@ function renderLeads() {
       </div>
       <div class="lead-meta">
         <span class="badge ${ST_CLASS[st]}">${BADGE_ST[st] || st}</span>
-        <div class="lead-date">${fmtDate(r.ts)}</div>
+        <div class="lead-date${st === 'Заплановане прибирання' && r.cleanDate ? ' lead-clean' : ''}">${st === 'Заплановане прибирання' && r.cleanDate ? fmtClean(r.cleanDate) : fmtDate(r.ts)}</div>
       </div>`;
     b.querySelector('.lead-name').textContent = r.name || 'Без імені';
     b.querySelector('.lead-phone').textContent = cleanPhone(r.phone);
@@ -1004,6 +1021,10 @@ function fillForm(r) {
   $('gReason').hidden = st !== 'Відмова';
   $('fReason').value = r.reason || 'Дорого';
   if ($('fReason').value !== (r.reason || 'Дорого')) { $('fReason').value = 'Інше'; }
+  $('gPlan').hidden = !PLAN_STS.includes(st);
+  const cd = String(r.cleanDate || '').match(/^\d{4}-\d{2}-\d{2}/);
+  $('fCleanDate').value = cd ? cd[0] : '';
+  $('fPrice').value = r.price || '';
   $('fService').value = r.service || '';
   if ($('fService').value !== (r.service || '')) { $('fService').value = 'Інше'; }
   $('fAddress').value = r.address || '';
@@ -1052,6 +1073,7 @@ $('fStatus').addEventListener('change', () => {
   $('cBadge').textContent = BADGE_ST[st] || st;
   $('cBadge').className = 'badge ' + ST_CLASS[st];
   $('gReason').hidden = st !== 'Відмова';
+  $('gPlan').hidden = !PLAN_STS.includes(st);
 });
 
 function showToast(msg) {
@@ -1073,6 +1095,8 @@ $('crmSaveBtn').addEventListener('click', async () => {
     comment: $('fComment').value.trim(),
   };
   fields.reason = $('fStatus').value === 'Відмова' ? $('fReason').value : '';
+  fields.cleanDate = $('fCleanDate').value;
+  fields.price = $('fPrice').value;
   fields.name = $('fName').value.trim();
   if (!r || r.src === 'manual') {
     fields.phone = $('fPhone').value.trim();
